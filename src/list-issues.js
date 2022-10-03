@@ -25,7 +25,7 @@ const coreTeam = [
 ];
 
 (async () => {
-    const orgNames = ["appwrite", "utopia-php"];
+    const orgNames = ["appwrite", "utopia-php", "open-runtimes"];
     for (const orgName of orgNames) {
         //   console.log("Scanning org...", orgName);
 
