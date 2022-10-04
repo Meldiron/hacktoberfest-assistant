@@ -41,13 +41,13 @@ const coreTeam = [
 (async () => {
     const orgNames = ["appwrite", "utopia-php", "open-runtimes"];
     for (const orgName of orgNames) {
-        //   console.log("Scanning org...", orgName);
+        // console.log("Scanning org...", orgName);
 
         const org = await gh.getOrganization(orgName);
         const repos = (await org.getRepos()).data;
 
         for (const repo of repos) {
-            //    console.log("Scanning repo...", repo.name);
+            // console.log("Scanning repo...", repo.name);
 
             const issueObj = gh.getIssues(orgName, repo.name);
             const issues = (
@@ -58,14 +58,56 @@ const coreTeam = [
                 })
             ).data;
 
-            for (const issue of issues) {
+            const repoObj = gh.getRepo(orgName, repo.name);
+            const prs = (await repoObj.listPullRequests({
+                state: "open",
+            })).data;
+
+            const activities = [
+                ...issues.map((i) => { return  { ...i, customType: 'issue' }} ),
+                ...prs.map((i) => { return  { ...i, customType: 'pr' }} ),
+            ];
+
+            for (const activity of activities) {
+                const activityEmoji = activity.customType == 'issue' ? '📄' : '🐛';
+
                 try {
-                    if (new Date(issue.created_at).getFullYear() < 2022) {
+                    if (new Date(activity.created_at).getFullYear() < 2022) {
                         continue;
                     }
 
-                    const comments = (await issueObj.listIssueComments(issue.number)).data
-                        .map((comment) => {
+                    let comments = [];
+
+                    if(activity.customType === 'issue') {
+                        comments = (await issueObj.listIssueComments(activity.number)).data
+                    } else if(activity.customType === 'pr') {
+                        if(coreTeam.includes(activity.user.login)) {
+                            continue;
+                        }
+
+                        let [ year, month, day ] = activity.created_at.split("T")[0].split("-");
+                        year = +year;
+                        month = +month;
+                        day = +day;
+
+                        if(year < 2022) {
+                            continue;
+                        }
+
+                        if(month < 9) {
+                            continue;
+                        }
+
+                        if(month === 0 && day < 30) {
+                            continue;
+                        }
+
+                        const url = '/repos/' + orgName + '/' + repo.name + '/issues/' + activity.number + '/comments';
+                        const rawComments = await org._requestAllPages(url);
+                        comments = rawComments.data;
+                    }
+
+                    comments = comments.map((comment) => {
                             return {
                                 ...comment,
                                 created_at: new Date(comment.created_at).getTime(),
@@ -98,15 +140,20 @@ const coreTeam = [
                                 });
 
                                 if (!adminReaction) {
-                                    console.log("- [ ] 👀 Action required: ", issue.html_url);
+                                    console.log("- [ ] " + activityEmoji + " Action Required: ", activity.html_url);
                                 }
                             } else {
-                                console.log("- [ ] 👀 Action required: ", issue.html_url);
+                                console.log("- [ ] " + activityEmoji + " Action Required: ", activity.html_url);
                             }
+                        }
+                    } else {
+                        if(activity.customType === 'pr') {
+                            console.log("- [ ] " + activityEmoji + " Action Required: ", activity.html_url);
                         }
                     }
                 } catch (err) {
-                    console.log("❌ Error loading ", issue.html_url);
+                    console.log(err);
+                    console.log("❌ Error Loading ", activity.customType, activity.html_url);
                 }
             }
         }
