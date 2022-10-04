@@ -54,13 +54,13 @@ const coreTeam = [
                 await issueObj.listIssues({
                     state: "open",
                     labels: "hacktoberfest",
-                    since: "2021-01-01",
+                    since: "2022-01-01",
                 })
             ).data;
 
             for (const issue of issues) {
                 try {
-                    if (new Date(issue.created_at).getFullYear() < 2021) {
+                    if (new Date(issue.created_at).getFullYear() < 2022) {
                         continue;
                     }
 
