@@ -12,16 +12,30 @@ const gh = new GitHub({
 });
 
 const coreTeam = [
+    "wess",
     "eldadfux",
-    "christyjacob4",
+    "stnguyen90",
     "TorstenDittmann",
-    "lohanidamodar",
-    "kodumbeats",
+    "tessamero",
+    "elad2412",
+    "heyCarla",
+    "codercatdev",
     "abnegate",
-    "PineappleIOnic",
-    "sarakaandorp",
+    "lohanidamodar",
+    "sara-k-48",
     "Meldiron",
+    "christyjacob4",
+    "fogelito",
+    "shimonewman",
+    "PineappleIOnic",
+    "gewenyu99",
     "adityaoberai",
+    "Haimantika",
+    "ArmanNik",
+    "chenparnasa",
+    "everly-gif",
+    "TenneG",
+    "MayEnder"
 ];
 
 (async () => {
@@ -40,13 +54,13 @@ const coreTeam = [
                 await issueObj.listIssues({
                     state: "open",
                     labels: "hacktoberfest",
-                    since: "2021-01-01",
+                    since: "2022-01-01",
                 })
             ).data;
 
             for (const issue of issues) {
                 try {
-                    if (new Date(issue.created_at).getFullYear() < 2021) {
+                    if (new Date(issue.created_at).getFullYear() < 2022) {
                         continue;
                     }
 
