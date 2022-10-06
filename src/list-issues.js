@@ -38,6 +38,30 @@ const coreTeam = [
     "MayEnder"
 ];
 
+const isMultiIssue = (title) => {
+    if(title.includes("Help Developers by Coding Demo of")) {
+        return true;
+    }
+
+    if(title.includes("Make a Dream Contribution")) {
+        return true;
+    }
+
+    if(title.includes("Help Developers by Writing Article About")) {
+        return true;
+    }
+
+    if(title.includes("Build Almost")) {
+        return true;
+    }
+
+    if(title.includes("Write Article About Importing")) {
+        return true;
+    }
+
+    return false;
+};
+
 (async () => {
     const orgNames = ["appwrite", "utopia-php", "open-runtimes"];
     for (const orgName of orgNames) {
@@ -48,7 +72,7 @@ const coreTeam = [
 
         for (const repo of repos) {
             // console.log("Scanning repo...", repo.name);
-
+            
             const issueObj = gh.getIssues(orgName, repo.name);
             const issues = (
                 await issueObj.listIssues({
@@ -69,8 +93,8 @@ const coreTeam = [
             ];
 
             for (const activity of activities) {
-                const activityEmoji = activity.customType == 'issue' ? '📄' : '🐛';
-
+                let activityEmoji = activity.customType == 'issue' ? '📄' : '🐛';
+                isMultiIssue(activity.title) ? activityEmoji += '👨‍👨‍👧‍👦' : false;
                 try {
                     if (new Date(activity.created_at).getFullYear() < 2022) {
                         continue;
