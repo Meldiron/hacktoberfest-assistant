@@ -38,80 +38,29 @@ const coreTeam = [
     "MayEnder"
 ];
 
-// TODO: do a search instead.
-const multipleAllowed = [
-    4202,
-    4201,
-    4200,
-    4199,
-    4198,
-    4197,
-    4196,
-    4195,
-    4194,
-    3970,
-    3969,
-    3968,
-    3967,
-    3966,
-    3965,
-    3964,
-    3963,
-    3962,
-    3961,
-    4253,
-    4252,
-    4251,
-    4250,
-    4249,
-    4248,
-    4247,
-    4246,
-    4245,
-    4244,
-    4243,
-    4242,
-    4241,
-    4240,
-    4239,
-    4238,
-    4237,
-    4236,
-    4235,
-    4234,
-    4233,
-    4232,
-    4231,
-    4229,
-    4228,
-    4227,
-    4226,
-    4225,
-    4224,
-    4223,
-    4222,
-    4221,
-    4220,
-    4219,
-    4218,
-    4217,
-    4216,
-    4215,
-    4024,
-    4036,
-    4035,
-    4034,
-    4033,
-    4032,
-    4031,
-    4030,
-    4029,
-    4028,
-    4026,
-    4025,
-    4024,
-    4286,
-];
+const isMultiIssue = (title) => {
+    if(title.includes("Help Developers by Coding Demo of")) {
+        return true;
+    }
+
+    if(title.includes("Make a Dream Contribution")) {
+        return true;
+    }
+
+    if(title.includes("Help Developers by Writing Article About")) {
+        return true;
+    }
+
+    if(title.includes("Build Almost")) {
+        return true;
+    }
+
+    if(title.includes("Write Article About Importing")) {
+        return true;
+    }
+
+    return false;
+};
 
 (async () => {
     const orgNames = ["appwrite", "utopia-php", "open-runtimes"];
@@ -145,7 +94,7 @@ const multipleAllowed = [
 
             for (const activity of activities) {
                 let activityEmoji = activity.customType == 'issue' ? '📄' : '🐛';
-                multipleAllowed.includes(activity.number) ? activityEmoji += '👨‍👨‍👧‍👦' : false;
+                isMultiIssue(activity.title) ? activityEmoji += '👨‍👨‍👧‍👦' : false;
                 try {
                     if (new Date(activity.created_at).getFullYear() < 2022) {
                         continue;
