@@ -63,6 +63,8 @@ const isMultiIssue = (title) => {
 };
 
 (async () => {
+    let totalAcceptedPrs = 0;
+
     const orgNames = ["appwrite", "utopia-php", "open-runtimes"];
     for (const orgName of orgNames) {
         // console.log("Scanning org...", orgName);
@@ -105,6 +107,13 @@ const isMultiIssue = (title) => {
                     if(activity.customType === 'issue') {
                         comments = (await issueObj.listIssueComments(activity.number)).data
                     } else if(activity.customType === 'pr') {
+                        const labels = activity.labels ?? [];
+                        const acceptedLabel = labels.find((l) => l.name === "hacktoberfest-accepted");
+                        if(acceptedLabel) {
+                            totalAcceptedPrs++;
+                            continue;
+                        }
+
                         if(coreTeam.includes(activity.user.login)) {
                             continue;
                         }
@@ -182,6 +191,9 @@ const isMultiIssue = (title) => {
             }
         }
     }
+
+    console.log("---");
+    console.log("Fun fact? We already approved " + totalAcceptedPrs + " PRs! 🎉");
 })()
     .then(() => {
         console.log("Finished!");
