@@ -108,7 +108,7 @@ const isMultiIssue = (title) => {
                         comments = (await issueObj.listIssueComments(activity.number)).data
                     } else if(activity.customType === 'pr') {
                         const labels = activity.labels ?? [];
-                        const acceptedLabel = labels.find((l) => l.name === "hacktoberfest-accepted");
+                        const acceptedLabel = labels.find((l) => ["hacktoberfest-accepted", "invalid"].includes(l.name));
                         if(acceptedLabel) {
                             totalAcceptedPrs++;
                             continue;
@@ -135,9 +135,17 @@ const isMultiIssue = (title) => {
                             continue;
                         }
 
-                        const url = '/repos/' + orgName + '/' + repo.name + '/issues/' + activity.number + '/comments';
-                        const rawComments = await org._requestAllPages(url);
-                        comments = rawComments.data;
+                        const promises = [];
+
+                        const issueUrl = '/repos/' + orgName + '/' + repo.name + '/issues/' + activity.number + '/comments';
+                        promises.push(org._requestAllPages(issueUrl));
+
+                        const reviewUrl = '/repos/' + orgName + '/' + repo.name + '/pulls/' + activity.number + '/comments';
+                        promises.push(org._requestAllPages(reviewUrl));
+
+                        const [rawIssueComments, rawReviewComments] = await Promise.all(promises);
+
+                        comments = [...rawIssueComments.data, ...rawReviewComments.data,];
                     }
 
                     comments = comments.map((comment) => {
