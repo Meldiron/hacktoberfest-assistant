@@ -108,7 +108,7 @@ const isMultiIssue = (title) => {
                         comments = (await issueObj.listIssueComments(activity.number)).data
                     } else if(activity.customType === 'pr') {
                         const labels = activity.labels ?? [];
-                        const acceptedLabel = labels.find((l) => l.name === "hacktoberfest-accepted");
+                        const acceptedLabel = labels.find((l) => ["hacktoberfest-accepted", "invalid"].includes(l.name));
                         if(acceptedLabel) {
                             totalAcceptedPrs++;
                             continue;
